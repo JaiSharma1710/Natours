@@ -11,34 +11,9 @@ mongoose
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: false,
+    useUnifiedTopology: true,
   })
   .then(() => console.log('connection was successful'));
-
-const toursSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'name is required'],
-    unique: true,
-  },
-  rating: {
-    type: Number,
-    default: 4.5,
-  },
-  price: {
-    type: Number,
-    required: [true, 'price is required'],
-  },
-});
-
-const Tour = new mongoose.model('Tour', toursSchema);
-
-// const testTour = new Tour({
-//   name: 'jai',
-//   rating: 5,
-//   price: 200,
-// });
-
-// testTour.save().then((res) => console.log(res));
 
 const port = process.env.PORT || '8000';
 
