@@ -1,26 +1,32 @@
 const Tour = require('../models/tourModels');
+const ApiFeatures = require('../utils/ApiFeatures');
 
-// exports.checkRequest = (req, res, next) => {
-//   if (!req.body.name || !req.body.price) {
-//     return res.status(400).json({
-//       status: 'bad request',
-//       message: 'name and price are needed',
-//     });
-//   }
-//   next();
-// };
+exports.topRatedToursMiddleware = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingsAverage';
+  req.query.fields = 'name,price,ratingsAverage,duration';
+  next();
+};
 
 exports.getToursData = async (req, res) => {
   try {
-    const allTourData = await Tour.find();
+    const features = new ApiFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limitingFeilds()
+      .pagination();
+
+    const allTourData = await features.query;
+
     res.status(200).json({
       status: 'success',
+      result: allTourData.length,
       data: allTourData,
     });
   } catch (err) {
     res.status(400).json({
       status: 'fail',
-      message: err,
+      message: 'an error occured',
     });
   }
 };
@@ -81,6 +87,38 @@ exports.deleteTourData = async (req, res) => {
     res.status(200).json({
       status: 200,
       data: deleteTour,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+//its used to aggregate the data together
+exports.getTourStatus = async (req, res) => {
+  try {
+    const stats = await Tour.aggregate([
+      {
+        $match: {
+          ratingsAverage: { $gte: 4.5 },
+        },
+      },
+      {
+        $group: {
+          _id: '$difficulty',
+          avgRating: { $avg: '$ratingsAverage' },
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' },
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      status: 200,
+      data: stats,
     });
   } catch (err) {
     res.status(400).json({
