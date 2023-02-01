@@ -107,7 +107,7 @@ exports.getTourStatus = async (req, res) => {
       },
       {
         $group: {
-          _id: '$difficulty',
+          _id: '$difficulty', //can be null if you dont want to divide in groups
           avgRating: { $avg: '$ratingsAverage' },
           avgPrice: { $avg: '$price' },
           minPrice: { $min: '$price' },
