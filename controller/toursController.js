@@ -96,6 +96,7 @@ exports.deleteTourData = async (req, res) => {
   }
 };
 
+//AGGRIGATION PIPELINE///////////////////////////////////////////////
 //its used to aggregate the data together
 exports.getTourStatus = async (req, res) => {
   try {

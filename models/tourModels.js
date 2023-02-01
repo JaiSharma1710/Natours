@@ -12,6 +12,7 @@ const toursSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'duration is required'],
     },
+    slug: String,
     maxGroupSize: {
       type: Number,
       required: [true, 'A max group size is required'],
@@ -59,10 +60,47 @@ const toursSchema = new mongoose.Schema(
   }
 );
 
-// these are vartual feilds not part of our database and can't be used in our db.
-toursSchema.virtual('durationWeeks').get(function () {
-  return this.duration / 7;
-});
+//VIRTUAL FEILDS////////////////////////////////////////////////////////////////////////////////////////////////
+//these are vartual feilds not part of our database and can't be used in our db.
+
+// toursSchema.virtual('durationWeeks').get(function () {
+//   return this.duration / 7;
+// });
+
+// // eslint-disable-next-line prefer-arrow-callback
+// toursSchema.virtual('ownerName').get(function () {
+//   return 'jai sharma';
+// });
+
+//DOCUMENT MIDDLEWARE./////////////////////////////////////////////////////////////////////////////////////////
+// WILL ONLY RUN ON CREATE() AND SAVE() METHORDS
+
+// toursSchema.pre('save', function (next) {
+//   this.slug = 'this_is_a_test_slug';
+//   next();
+// });
+
+// toursSchema.post('save', (doc, next) => {
+//   // eslint-disable-next-line no-console
+//   console.log(doc);
+//   next();
+// });
+
+//QUERY MIDDLEWARE////////////////////////////////////////////////////////////////////////////////////////////
+
+// toursSchema.pre('find', function (next) {
+// toursSchema.pre(/^find/, function (next) {
+//   this.find({ duration: { $gte: 5 } });
+//   next();
+// });
+
+//AGGRIGATION MIDDLEWARE///////////////////////////////////////////////////////////////////////////////////////
+
+// toursSchema.pre('aggregate', function (next) {
+//   // eslint-disable-next-line no-console
+//   console.log(this, 'hello');
+//   next();
+// });
 
 // eslint-disable-next-line new-cap
 const Tour = new mongoose.model('Tour', toursSchema);
