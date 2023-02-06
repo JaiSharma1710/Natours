@@ -1,5 +1,7 @@
 const Tour = require('../models/tourModels');
 const ApiFeatures = require('../utils/ApiFeatures');
+const AppError = require('../utils/AppError');
+const catchAsync = require('../utils/CatchAsync');
 
 exports.topRatedToursMiddleware = (req, res, next) => {
   req.query.limit = '5';
@@ -8,28 +10,21 @@ exports.topRatedToursMiddleware = (req, res, next) => {
   next();
 };
 
-exports.getToursData = async (req, res) => {
-  try {
-    const features = new ApiFeatures(Tour.find(), req.query)
-      .filter()
-      .sort()
-      .limitingFeilds()
-      .pagination();
+exports.getToursData = catchAsync(async (req, res, next) => {
+  const features = new ApiFeatures(Tour.find(), req.query)
+    .filter()
+    .sort()
+    .limitingFeilds()
+    .pagination();
 
-    const allTourData = await features.query;
+  const allTourData = await features.query;
 
-    res.status(200).json({
-      status: 'success',
-      result: allTourData.length,
-      data: allTourData,
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: 'an error occured',
-    });
-  }
-};
+  res.status(200).json({
+    status: 'success',
+    result: allTourData.length,
+    data: allTourData,
+  });
+});
 
 exports.postTourData = async (req, res) => {
   try {
@@ -47,8 +42,13 @@ exports.postTourData = async (req, res) => {
   }
 };
 
-exports.getTourData = async (req, res) => {
+exports.getTourData = async (req, res, next) => {
   const tour = await Tour.findById(req.params.id);
+
+  if (!tour) {
+    return next(new AppError('no tour found with this id', 404));
+  }
+
   try {
     res.status(200).json({
       status: 'success',
